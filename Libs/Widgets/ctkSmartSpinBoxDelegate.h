@@ -24,13 +24,15 @@
 // Qt includes
 #include <QStyledItemDelegate>
 
+#include "ctkWidgetsExport.h"
+
 class ctkSmartSpinBoxDelegatePrivate;
 
 /// \brief Item delegate for smart spinBox editing.
 /// Uses ctkSmartSpinBoxEditor to automatically adjust the precision of the
 /// spinBox according the new value entered by the user. Used in ctkMatrixWidget
 /// \sa ctkSmartSpinBoxEditor, ctkMatrixWidget
-class ctkSmartSpinBoxDelegate : public QStyledItemDelegate
+class CTK_WIDGETS_EXPORT ctkSmartSpinBoxDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
   Q_PROPERTY(int decimals READ decimals WRITE setDecimals)

@@ -17,9 +17,9 @@
   limitations under the License.
 
 =========================================================================*/
+
 #include "ctkSmartSpinBoxEditor.h"
-#include <QDebug>
-#include <ctkUtils.h>
+#include "ctkUtils.h"
 
 //-----------------------------------------------------------------------------
 ctkSmartSpinBoxEditor::ctkSmartSpinBoxEditor(QWidget* parent) :

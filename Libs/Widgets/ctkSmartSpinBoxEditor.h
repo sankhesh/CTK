@@ -21,10 +21,14 @@
 #ifndef __ctkSmartSpinBoxEditor_h
 #define __ctkSmartSpinBoxEditor_h
 
+// Qt includes
 #include <QWidget>
 #include <QDoubleSpinBox>
 
-class ctkSmartSpinBoxEditor : public QDoubleSpinBox
+// CTK includes
+#include "ctkWidgetsExport.h"
+
+class CTK_WIDGETS_EXPORT ctkSmartSpinBoxEditor : public QDoubleSpinBox
 {
   Q_OBJECT
 public:
