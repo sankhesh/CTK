@@ -69,6 +69,7 @@ protected:
   ctkMatrixWidget* const q_ptr;
 public:
   ctkMatrixWidgetPrivate(ctkMatrixWidget& object, int rows = 4, int columns = 4);
+  ~ctkMatrixWidgetPrivate();
 
   void init();
   void validateItems();
@@ -82,6 +83,8 @@ public:
   double Maximum;
   int    Decimals;
   double SingleStep;
+
+  ctkSmartSpinBoxDelegate* smartSpinBox;
 };
 
 //-----------------------------------------------------------------------------
@@ -89,6 +92,15 @@ ctkMatrixWidgetPrivate::ctkMatrixWidgetPrivate(ctkMatrixWidget& object, int rows
   :q_ptr(&object)
 {
   this->Table = new QTableWidget(rows, columns);
+}
+
+//-----------------------------------------------------------------------------
+ctkMatrixWidgetPrivate::~ctkMatrixWidgetPrivate()
+{
+  if (this->smartSpinBox)
+    {
+    delete this->smartSpinBox;
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -135,7 +147,13 @@ void ctkMatrixWidgetPrivate::init()
 //  Q_ASSERT(defaultItemDelegate);
 //  defaultItemDelegate->setItemEditorFactory(editorFactory);
 
-  this->Table->setItemDelegate(new ctkSmartSpinBoxDelegate);
+  this->smartSpinBox = new ctkSmartSpinBoxDelegate();
+  this->smartSpinBox->setDecimals(this->Decimals);
+  this->smartSpinBox->setMaximum(this->Maximum);
+  this->smartSpinBox->setMinimum(this->Minimum);
+  this->smartSpinBox->setSingleStep(this->SingleStep);
+
+  this->Table->setItemDelegate(this->smartSpinBox);
 
   // Define prototype item
   QTableWidgetItem* _item = new QTableWidgetItem;
@@ -311,7 +329,7 @@ void ctkMatrixWidget::setEditable(bool newEditable)
 CTK_GET_CPP(ctkMatrixWidget, double, minimum, Minimum);
 CTK_GET_CPP(ctkMatrixWidget, double, maximum, Maximum);
 CTK_GET_CPP(ctkMatrixWidget, double, singleStep, SingleStep);
-CTK_SET_CPP(ctkMatrixWidget, double, setSingleStep, SingleStep);
+//CTK_SET_CPP(ctkMatrixWidget, double, setSingleStep, SingleStep);
 CTK_GET_CPP(ctkMatrixWidget, int, decimals, Decimals);
 
 // --------------------------------------------------------------------------
@@ -320,6 +338,8 @@ void ctkMatrixWidget::setMinimum(double newMinimum)
   Q_D(ctkMatrixWidget);
   d->Minimum = newMinimum;
   d->Maximum = qMax(newMinimum, d->Maximum);
+  d->smartSpinBox->setMaximum(d->Maximum);
+  d->smartSpinBox->setMinimum(d->Minimum);
   d->validateItems();
 }
 
@@ -329,7 +349,17 @@ void ctkMatrixWidget::setMaximum(double newMaximum)
   Q_D(ctkMatrixWidget);
   d->Minimum = qMin(d->Minimum, newMaximum);
   d->Maximum = newMaximum;
+  d->smartSpinBox->setMaximum(d->Maximum);
+  d->smartSpinBox->setMinimum(d->Minimum);
   d->validateItems();
+}
+
+// --------------------------------------------------------------------------
+void ctkMatrixWidget::setSingleStep(double newSingleStep)
+{
+  Q_D(ctkMatrixWidget);
+  d->SingleStep = newSingleStep;
+  d->smartSpinBox->setSingleStep(d->SingleStep);
 }
 
 // --------------------------------------------------------------------------
@@ -346,6 +376,7 @@ void ctkMatrixWidget::setDecimals(int decimals)
 {
   Q_D(ctkMatrixWidget);
   d->Decimals = qMax(0, decimals);
+  d->smartSpinBox->setDecimals(d->Decimals);
 }
 
 // --------------------------------------------------------------------------
