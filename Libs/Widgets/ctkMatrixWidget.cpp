@@ -20,6 +20,7 @@
 
 // CTK includes
 #include "ctkMatrixWidget.h"
+#include "ctkSmartSpinBoxDelegate.h"
 
 // Qt includes
 #include <QDebug>
@@ -126,13 +127,15 @@ void ctkMatrixWidgetPrivate::init()
   this->Table->setFrameStyle(QFrame::NoFrame);
 
   // Register custom editors
-  QItemEditorFactory *editorFactory = new QItemEditorFactory;
-  editorFactory->registerEditor(QVariant::Double, new QStandardItemEditorCreator<ctkMatrixDoubleSpinBox>);
+//  QItemEditorFactory *editorFactory = new QItemEditorFactory;
+//  editorFactory->registerEditor(QVariant::Double, new QStandardItemEditorCreator<ctkMatrixDoubleSpinBox>);
 
-  QStyledItemDelegate* defaultItemDelegate =
-    qobject_cast<QStyledItemDelegate*>(this->Table->itemDelegate());
-  Q_ASSERT(defaultItemDelegate);
-  defaultItemDelegate->setItemEditorFactory(editorFactory);
+//  QStyledItemDelegate* defaultItemDelegate =
+//    qobject_cast<QStyledItemDelegate*>(this->Table->itemDelegate());
+//  Q_ASSERT(defaultItemDelegate);
+//  defaultItemDelegate->setItemEditorFactory(editorFactory);
+
+  this->Table->setItemDelegate(new ctkSmartSpinBoxDelegate);
 
   // Define prototype item
   QTableWidgetItem* _item = new QTableWidgetItem;
