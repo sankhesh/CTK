@@ -28,12 +28,27 @@
 // CTK includes
 #include "ctkWidgetsExport.h"
 
+class ctkSmartSpinBoxEditorPrivate;
+
+/// \brief Smart spinbox item editor
+/// Provides a smartspinbox editor for editing double precision value items.
+/// \sa ctkSmartSpinBoxDelegate
 class CTK_WIDGETS_EXPORT ctkSmartSpinBoxEditor : public QDoubleSpinBox
 {
   Q_OBJECT
+  Q_PROPERTY(int minimumDecimals READ minimumDecimals WRITE setMinimumDecimals)
+
 public:
   /// Constructor, creates a QDoubleSpinBox
   ctkSmartSpinBoxEditor(QWidget* parent = 0);
+
+  /// Minimum precision to maintain on the spinbox editor.
+  /// When the user enters a value, its precision will be compared to
+  /// MinimumDecimals and the higher value will be set as the precision
+  /// of the model.
+  /// \sa ctkSmartSpinBoxDelegate::setMinimumDecimals
+  int minimumDecimals()const;
+  void setMinimumDecimals(int newMinimumDecimals);
 
 protected:
   /// Overloaded method from QAbstractSpinBox.
@@ -41,12 +56,20 @@ protected:
   /// enter value as desired.
   void focusInEvent(QFocusEvent* event);
 
+  /// Converts the double value to the given decimal precision
+  /// Returns whether the operation was successful
+  static bool fixDoublePrecision(double& value, const int decimals);
+
 private slots:
   /// adjustDecimals is called when the user is finished editing the spinBox
   /// value. This method sets the precision of the spinBox based on the number
   /// of significant decimals in the value entered by the user.
   /// \sa ctk::significantDecimals()
   void adjustDecimals();
-};
 
+private:
+  ctkSmartSpinBoxEditorPrivate* const d_ptr;
+  Q_DECLARE_PRIVATE(ctkSmartSpinBoxEditor);
+  Q_DISABLE_COPY(ctkSmartSpinBoxEditor);
+};
 #endif //__ctkSmartSpinBoxEditor_h

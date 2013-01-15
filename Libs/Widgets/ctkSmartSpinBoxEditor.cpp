@@ -18,32 +18,83 @@
 
 =========================================================================*/
 
+#include <cfloat>
+#include <cmath>
+
+// CTK includes
 #include "ctkSmartSpinBoxEditor.h"
 #include "ctkUtils.h"
+#include "ctkPimpl.h"
+
+// Qt includes
+#include <QLineEdit>
 
 //-----------------------------------------------------------------------------
-ctkSmartSpinBoxEditor::ctkSmartSpinBoxEditor(QWidget* parent) :
-  QDoubleSpinBox(parent)
+class ctkSmartSpinBoxEditorPrivate
+{
+  Q_DECLARE_PUBLIC(ctkSmartSpinBoxEditor);
+protected:
+  ctkSmartSpinBoxEditor* const q_ptr;
+public:
+  ctkSmartSpinBoxEditorPrivate(ctkSmartSpinBoxEditor& object)
+    : q_ptr(&object)
+    {
+    this->MinimumDecimals = 8;
+    }
+
+  int MinimumDecimals;
+};
+
+//-----------------------------------------------------------------------------
+ctkSmartSpinBoxEditor::ctkSmartSpinBoxEditor(QWidget* parent)
+  : QDoubleSpinBox(parent)
+    ,d_ptr(new ctkSmartSpinBoxEditorPrivate(*this))
 {
   connect(this, SIGNAL(editingFinished()), this, SLOT(adjustDecimals()));
 }
 
 //-----------------------------------------------------------------------------
+CTK_GET_CPP(ctkSmartSpinBoxEditor, int, minimumDecimals, MinimumDecimals);
+CTK_SET_CPP(ctkSmartSpinBoxEditor, int, setMinimumDecimals, MinimumDecimals);
+
+//-----------------------------------------------------------------------------
 void ctkSmartSpinBoxEditor::focusInEvent(QFocusEvent* event)
 {
+  Q_UNUSED(event);
   double oldValue = this->value();
   this->blockSignals(true);
   int oldDecimals = this->decimals();
-  this->setDecimals(oldDecimals + 20);
-  this->setValue(oldValue);
+  this->fixDoublePrecision(oldValue, oldDecimals);
+  // Set maximum possible precision
+  this->setDecimals(DBL_MAX_10_EXP + DBL_DIG);
+  QVariant variant(oldValue);
+  this->lineEdit()->setText(variant.toString());
   this->blockSignals(false);
 }
 
 //-----------------------------------------------------------------------------
 void ctkSmartSpinBoxEditor::adjustDecimals()
 {
-  int decimals = qMin(ctk::significantDecimals(this->value()),8);
+  Q_D(ctkSmartSpinBoxEditor);
+  int decimals = qMin(ctk::significantDecimals(this->value()),
+                      d->MinimumDecimals);
   this->blockSignals(true);
   this->setDecimals(decimals);
   this->blockSignals(false);
+}
+
+//-----------------------------------------------------------------------------
+bool ctkSmartSpinBoxEditor::fixDoublePrecision(double& value, const int decimals)
+{
+  double newValue = value*(pow(10, decimals));
+  double longValue = static_cast<long>(newValue);
+
+  // Check if the casting hasn't exceeded the numeric limits of long type
+  double error = abs (longValue - newValue);
+  if (error > 1e-6)
+    {
+    return false;
+    }
+  value = longValue/(pow(10, decimals));
+  return true;
 }

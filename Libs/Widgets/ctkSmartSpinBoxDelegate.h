@@ -36,6 +36,7 @@ class CTK_WIDGETS_EXPORT ctkSmartSpinBoxDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
   Q_PROPERTY(int decimals READ decimals WRITE setDecimals)
+  Q_PROPERTY(int minimumDecimals READ minimumDecimals WRITE setMinimumDecimals)
   Q_PROPERTY(double maximum READ maximum WRITE setMaximum)
   Q_PROPERTY(double minimum READ minimum WRITE setMinimum)
   Q_PROPERTY(double singleStep READ singleStep WRITE setSingleStep)
@@ -69,6 +70,14 @@ public:
   /// editor entered by the user.
   int decimals()const;
   void setDecimals(int newDecimals);
+
+  /// This property holds the minimum precision of the double value that the
+  /// spinbox editor should resolve to. When the user enters a value, its
+  /// precision will be compared to MinimumDecimals and the higher value will
+  /// be set as the precision of the model.
+  /// \sa decimals(), ctkSmartSpinBoxEditor::setMinimumDecimals
+  int minimumDecimals()const;
+  void setMinimumDecimals(int newMinimumDecimals);
 
   /// This property holds the maximum value that will be set on the spinbox
   /// editor.

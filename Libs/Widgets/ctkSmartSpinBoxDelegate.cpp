@@ -36,6 +36,7 @@ public:
   void init();
   // Parameters for the spinbox
   int Decimals;
+  int MinimumDecimals;
   double Maximum;
   double Minimum;
   double SingleStep;
@@ -51,7 +52,8 @@ ctkSmartSpinBoxDelegatePrivate::ctkSmartSpinBoxDelegatePrivate(
 //-----------------------------------------------------------------------------
 void ctkSmartSpinBoxDelegatePrivate::init()
 {
-  this->Decimals = 2;
+  this->Decimals = 8;
+  this->MinimumDecimals = 8;
   this->Maximum = 100;
   this->Minimum = 0;
   this->SingleStep = 1;
@@ -60,6 +62,8 @@ void ctkSmartSpinBoxDelegatePrivate::init()
 //-----------------------------------------------------------------------------
 CTK_SET_CPP(ctkSmartSpinBoxDelegate, int, setDecimals, Decimals);
 CTK_GET_CPP(ctkSmartSpinBoxDelegate, int, decimals, Decimals);
+CTK_SET_CPP(ctkSmartSpinBoxDelegate, int, setMinimumDecimals, MinimumDecimals);
+CTK_GET_CPP(ctkSmartSpinBoxDelegate, int, minimumDecimals, MinimumDecimals);
 CTK_SET_CPP(ctkSmartSpinBoxDelegate, double, setMaximum, Maximum);
 CTK_GET_CPP(ctkSmartSpinBoxDelegate, double, maximum, Maximum);
 CTK_SET_CPP(ctkSmartSpinBoxDelegate, double, setMinimum, Minimum);
@@ -85,6 +89,7 @@ QWidget* ctkSmartSpinBoxDelegate::createEditor(QWidget* parent,
   Q_UNUSED(index);
   ctkSmartSpinBoxEditor* editor = new ctkSmartSpinBoxEditor(parent);
   editor->setDecimals(this->decimals());
+  editor->setMinimumDecimals(this->minimumDecimals());
   editor->setMaximum(this->maximum());
   editor->setMinimum(this->minimum());
   editor->setSingleStep(this->singleStep());
