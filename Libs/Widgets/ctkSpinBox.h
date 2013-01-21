@@ -18,8 +18,8 @@
 
 =========================================================================*/
 
-#ifndef __ctkSmartSpinBoxEditor_h
-#define __ctkSmartSpinBoxEditor_h
+#ifndef __ctkSpinBox_h
+#define __ctkSpinBox_h
 
 // Qt includes
 #include <QWidget>
@@ -28,27 +28,57 @@
 // CTK includes
 #include "ctkWidgetsExport.h"
 
-class ctkSmartSpinBoxEditorPrivate;
+class ctkSpinBoxPrivate;
 
 /// \brief Smart spinbox item editor
 /// Provides a smartspinbox editor for editing double precision value items.
 /// \sa ctkSmartSpinBoxDelegate
-class CTK_WIDGETS_EXPORT ctkSmartSpinBoxEditor : public QDoubleSpinBox
+class CTK_WIDGETS_EXPORT ctkSpinBox : public QDoubleSpinBox
 {
   Q_OBJECT
   Q_PROPERTY(int minimumDecimals READ minimumDecimals WRITE setMinimumDecimals)
 
 public:
+  typedef QDoubleSpinBox Superclass;
+
   /// Constructor, creates a QDoubleSpinBox
-  ctkSmartSpinBoxEditor(QWidget* parent = 0);
+  ctkSpinBox(QWidget* parent = 0);
 
   /// Minimum precision to maintain on the spinbox editor.
   /// When the user enters a value, its precision will be compared to
   /// MinimumDecimals and the higher value will be set as the precision
-  /// of the model.
-  /// \sa ctkSmartSpinBoxDelegate::setMinimumDecimals
+  /// of the model. This is ignored if FixedPrecision is set to true.
+  /// \sa ctkSmartSpinBoxDelegate::setMinimumDecimals(), setFixedPrecision()
   int minimumDecimals()const;
   void setMinimumDecimals(int newMinimumDecimals);
+
+  /// Set whether the spinbox has a fixed precision
+  /// If set to true, the number of decimals can be set by setDecimals().
+  /// If set to false, one can set the number of minimum decimals.
+  /// \sa QDoubleSpinBox::setDecimals(), setMinimumDecimals()
+  bool fixedPrecision()const;
+  void setFixedPrecision(bool enable);
+
+  /// Reimplemented from QDoubleSpinBox. Before changing the value,
+  /// this function emits the valueAboutToBeChanged() signal.
+  /// \sa valueAboutToBeChanged(), value()
+  void setValue(double newValue);
+
+  /// Reimplemented from QDoubleSpinBox. After changing the decimals,
+  /// this function emits the decimalsChanged() signal.
+  /// \sa decimalsChanged()
+  void setDecimals(int newDecimals);
+
+Q_SIGNALS:
+  /// This signal is emitted whenever the value of the spinbox is going to
+  /// change due to either user events or programmatically.
+  /// \sa setValue()
+  void valueAboutToBeChanged();
+
+  /// This signal is emitted whenever the precision of the spinbox changes.
+  /// The new value of decimals is passed.
+  /// \sa setDecimals(), decimals()
+  void decimalsChanged(int decimals);
 
 protected:
   /// Overloaded method from QAbstractSpinBox.
@@ -56,11 +86,16 @@ protected:
   /// enter value as desired.
   void focusInEvent(QFocusEvent* event);
 
-  /// Converts the double value to the given decimal precision
-  /// Returns whether the operation was successful
+  /// Overloaded method from QAbstractSpinBox.
+  /// Sets the precision of the spinbox based on the number of significant
+  /// decimals in the value entered by the user.
+  void focusOutEvent(QFocusEvent* event);
+
+  /// Converts the double value to the given decimal precision.
+  /// Returns whether the operation was successful.
   static bool fixDoublePrecision(double& value, const int decimals);
 
-private slots:
+private Q_SLOTS:
   /// adjustDecimals is called when the user is finished editing the spinBox
   /// value. This method sets the precision of the spinBox based on the number
   /// of significant decimals in the value entered by the user.
@@ -68,8 +103,8 @@ private slots:
   void adjustDecimals();
 
 private:
-  ctkSmartSpinBoxEditorPrivate* const d_ptr;
-  Q_DECLARE_PRIVATE(ctkSmartSpinBoxEditor);
-  Q_DISABLE_COPY(ctkSmartSpinBoxEditor);
+  ctkSpinBoxPrivate* const d_ptr;
+  Q_DECLARE_PRIVATE(ctkSpinBox);
+  Q_DISABLE_COPY(ctkSpinBox);
 };
-#endif //__ctkSmartSpinBoxEditor_h
+#endif //__ctkSpinBox_h

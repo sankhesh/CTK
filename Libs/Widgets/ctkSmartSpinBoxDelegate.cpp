@@ -19,10 +19,10 @@
 =========================================================================*/
 
 // CTK includes
-#include "ctkSmartSpinBoxDelegate.h"
-#include "ctkSmartSpinBoxEditor.h"
-#include "ctkUtils.h"
 #include "ctkPimpl.h"
+#include "ctkSmartSpinBoxDelegate.h"
+#include "ctkSpinBox.h"
+#include "ctkUtils.h"
 
 //-----------------------------------------------------------------------------
 class ctkSmartSpinBoxDelegatePrivate
@@ -36,6 +36,7 @@ public:
   void init();
   // Parameters for the spinbox
   int Decimals;
+  bool FixedPrecision;
   int MinimumDecimals;
   double Maximum;
   double Minimum;
@@ -53,6 +54,7 @@ ctkSmartSpinBoxDelegatePrivate::ctkSmartSpinBoxDelegatePrivate(
 void ctkSmartSpinBoxDelegatePrivate::init()
 {
   this->Decimals = 8;
+  this->FixedPrecision = false;
   this->MinimumDecimals = 8;
   this->Maximum = 100;
   this->Minimum = 0;
@@ -62,6 +64,8 @@ void ctkSmartSpinBoxDelegatePrivate::init()
 //-----------------------------------------------------------------------------
 CTK_SET_CPP(ctkSmartSpinBoxDelegate, int, setDecimals, Decimals);
 CTK_GET_CPP(ctkSmartSpinBoxDelegate, int, decimals, Decimals);
+CTK_SET_CPP(ctkSmartSpinBoxDelegate, bool, setFixedPrecision, FixedPrecision);
+CTK_GET_CPP(ctkSmartSpinBoxDelegate, bool, fixedPrecision, FixedPrecision);
 CTK_SET_CPP(ctkSmartSpinBoxDelegate, int, setMinimumDecimals, MinimumDecimals);
 CTK_GET_CPP(ctkSmartSpinBoxDelegate, int, minimumDecimals, MinimumDecimals);
 CTK_SET_CPP(ctkSmartSpinBoxDelegate, double, setMaximum, Maximum);
@@ -87,12 +91,15 @@ QWidget* ctkSmartSpinBoxDelegate::createEditor(QWidget* parent,
 {
   Q_UNUSED(option);
   Q_UNUSED(index);
-  ctkSmartSpinBoxEditor* editor = new ctkSmartSpinBoxEditor(parent);
+  ctkSpinBox* editor = new ctkSpinBox(parent);
   editor->setDecimals(this->decimals());
+  editor->setFixedPrecision(this->fixedPrecision());
   editor->setMinimumDecimals(this->minimumDecimals());
   editor->setMaximum(this->maximum());
   editor->setMinimum(this->minimum());
   editor->setSingleStep(this->singleStep());
+  connect(editor, SIGNAL(decimalsChanged(int)),
+          this, SLOT(emitDecimalsChangedSignal(int)));
   connect(editor, SIGNAL(editingFinished()), this, SLOT(commitAndCloseEditor()));
   return editor;
 }
@@ -100,7 +107,7 @@ QWidget* ctkSmartSpinBoxDelegate::createEditor(QWidget* parent,
 //-----------------------------------------------------------------------------
 void ctkSmartSpinBoxDelegate::commitAndCloseEditor()
 {
-  ctkSmartSpinBoxEditor* editor = qobject_cast<ctkSmartSpinBoxEditor *>(sender());
+  ctkSpinBox* editor = qobject_cast<ctkSpinBox *>(sender());
   // Get the new precision from the editor
   this->setDecimals(editor->decimals());
   emit commitData(editor);
@@ -113,7 +120,7 @@ void ctkSmartSpinBoxDelegate::setEditorData(QWidget* editor,
 {
   if (qVariantCanConvert<double>(index.data()))
     {
-    ctkSmartSpinBoxEditor* spinboxEditor = qobject_cast<ctkSmartSpinBoxEditor *>(editor);
+    ctkSpinBox* spinboxEditor = qobject_cast<ctkSpinBox *>(editor);
     Q_ASSERT(spinboxEditor);
     double value = index.data().toDouble();
     spinboxEditor->blockSignals(true);
@@ -121,7 +128,7 @@ void ctkSmartSpinBoxDelegate::setEditorData(QWidget* editor,
     spinboxEditor->blockSignals(false);
     }
   else
-  {
+    {
     QStyledItemDelegate::setEditorData(editor, index);
     }
 }
@@ -133,7 +140,7 @@ void ctkSmartSpinBoxDelegate::setModelData(QWidget *editor,
 {
   if (qVariantCanConvert<double>(index.data()))
     {
-    ctkSmartSpinBoxEditor* spinboxEditor = qobject_cast<ctkSmartSpinBoxEditor *>(editor);
+    ctkSpinBox* spinboxEditor = qobject_cast<ctkSpinBox *>(editor);
     Q_ASSERT(spinboxEditor);
     model->setData(index, qVariantFromValue(spinboxEditor->value()));
     }
@@ -141,4 +148,10 @@ void ctkSmartSpinBoxDelegate::setModelData(QWidget *editor,
     {
     QStyledItemDelegate::setModelData(editor, model, index);
     }
+}
+
+//-----------------------------------------------------------------------------
+void ctkSmartSpinBoxDelegate::emitDecimalsChangedSignal(int decimals)
+{
+  emit this->decimalsChanged(decimals);
 }

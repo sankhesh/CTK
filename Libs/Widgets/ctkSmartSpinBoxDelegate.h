@@ -29,9 +29,9 @@
 class ctkSmartSpinBoxDelegatePrivate;
 
 /// \brief Item delegate for smart spinBox editing.
-/// Uses ctkSmartSpinBoxEditor to automatically adjust the precision of the
+/// Uses ctkSpinBox to automatically adjust the precision of the
 /// spinBox according the new value entered by the user. Used in ctkMatrixWidget
-/// \sa ctkSmartSpinBoxEditor, ctkMatrixWidget
+/// \sa ctkSpinBox, ctkMatrixWidget
 class CTK_WIDGETS_EXPORT ctkSmartSpinBoxDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
@@ -50,7 +50,7 @@ public:
 
   /// Creates and returns the editor to be used for editing the data item with
   /// the given index.
-  /// \sa ctkSmartSpinBoxEditor, QAbstractItemDelegate::createEditor()
+  /// \sa ctkSpinBox, QAbstractItemDelegate::createEditor()
   QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option,
                         const QModelIndex &index) const;
 
@@ -75,9 +75,14 @@ public:
   /// spinbox editor should resolve to. When the user enters a value, its
   /// precision will be compared to MinimumDecimals and the higher value will
   /// be set as the precision of the model.
-  /// \sa decimals(), ctkSmartSpinBoxEditor::setMinimumDecimals
+  /// \sa decimals(), ctkSpinBox::setMinimumDecimals
   int minimumDecimals()const;
   void setMinimumDecimals(int newMinimumDecimals);
+
+  /// Set whether the spinbox editor has a fixed precision
+  /// \sa ctkSpinBox::fixedPrecision()
+  bool fixedPrecision()const;
+  void setFixedPrecision(bool enable);
 
   /// This property holds the maximum value that will be set on the spinbox
   /// editor.
@@ -93,9 +98,20 @@ public:
   double singleStep()const;
   void setSingleStep(double step);
 
-private slots:
+Q_SIGNALS:
+  /// This signal is emitted whenever the spinbox editor emits the
+  /// decimalsChanged() signal
+  /// \sa emitDecimalsChangedSignal(), ctkSpinBox::decimalsChanged()
+  void decimalsChanged(int decimals);
+
+public Q_SLOTS:
+  /// Relay the decimalsChanged signal
+  /// \sa decimalsChanged()
+  void emitDecimalsChangedSignal(int decimals);
+
+private Q_SLOTS:
   /// commitAndCloseEditor() is invoked when the editingFinished() signal is
-  /// fired by the ctkSmartSpinBoxEditor. This slot emits the commitData and
+  /// fired by the ctkSpinBox. This slot emits the commitData and
   /// closeEditor signals to update the model data and close the editor.
   /// \sa editingFinished(), commitData(), closeEditor()
   void commitAndCloseEditor();
