@@ -104,11 +104,6 @@ Q_SIGNALS:
   /// \sa emitDecimalsChangedSignal(), ctkSpinBox::decimalsChanged()
   void decimalsChanged(int decimals);
 
-public Q_SLOTS:
-  /// Relay the decimalsChanged signal
-  /// \sa decimalsChanged()
-  void emitDecimalsChangedSignal(int decimals);
-
 private Q_SLOTS:
   /// commitAndCloseEditor() is invoked when the editingFinished() signal is
   /// fired by the ctkSpinBox. This slot emits the commitData and

@@ -138,6 +138,9 @@ public Q_SLOTS:
 Q_SIGNALS:
   void matrixChanged();
 
+  /// This signal is emitted whenever the precision of the spinbox changes
+  void decimalsChanged(int decimals);
+
 protected:
   virtual void resizeEvent(QResizeEvent* event);
 

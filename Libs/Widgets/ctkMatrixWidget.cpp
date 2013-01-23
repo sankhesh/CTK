@@ -155,6 +155,9 @@ void ctkMatrixWidgetPrivate::init()
   this->smartSpinBox->setMinimum(this->Minimum);
   this->smartSpinBox->setSingleStep(this->SingleStep);
 
+  QObject::connect(this->smartSpinBox, SIGNAL(decimalsChanged(int)),
+                   q, SIGNAL(decimalsChanged(int)));
+
   this->Table->setItemDelegate(this->smartSpinBox);
 
   // Define prototype item

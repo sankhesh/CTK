@@ -27,7 +27,7 @@
 #include "ctkSliderWidget.h"
 #include "ui_ctkSliderWidget.h"
 
-// STD includes 
+// STD includes
 #include <cmath>
 
 //-----------------------------------------------------------------------------
@@ -126,13 +126,14 @@ ctkSliderWidget::ctkSliderWidget(QWidget* _parent) : Superclass(_parent)
   , d_ptr(new ctkSliderWidgetPrivate(*this))
 {
   Q_D(ctkSliderWidget);
-  
+
   d->setupUi(this);
 
   d->Slider->setMaximum(d->SpinBox->maximum());
   d->Slider->setMinimum(d->SpinBox->minimum());
 
   this->connect(d->SpinBox, SIGNAL(valueChanged(double)), d->Slider, SLOT(setValue(double)));
+  this->connect(d->SpinBox, SIGNAL(decimalsChanged(int)), this, SIGNAL(decimalsChanged(int)));
 
   //this->connect(d->Slider, SIGNAL(valueChanged(double)), SIGNAL(valueChanged(double)));
   this->connect(d->Slider, SIGNAL(sliderPressed()), this, SLOT(startChanging()));
@@ -200,11 +201,11 @@ void ctkSliderWidget::setMaximum(double max)
 void ctkSliderWidget::setRange(double min, double max)
 {
   Q_D(ctkSliderWidget);
-  
+
   bool wasBlocked = d->SpinBox->blockSignals(true);
   d->SpinBox->setRange(min, max);
   d->SpinBox->blockSignals(wasBlocked);
-  
+
   // SpinBox can truncate the range (depending on decimals).
   // use Spinbox's range to set Slider's range
   d->Slider->setRange(d->SpinBox->minimum(), d->SpinBox->maximum());
@@ -292,12 +293,12 @@ void ctkSliderWidget::stopChanging()
 void ctkSliderWidget::changeValue(double newValue)
 {
   Q_D(ctkSliderWidget);
-  
+
   bool wasBlocked = d->SpinBox->blockSignals(true);
   d->SpinBox->setValue(newValue);
   d->SpinBox->blockSignals(wasBlocked);
   Q_ASSERT(d->equal(d->SpinBox->value(), d->Slider->value()));
-  
+
   if (!d->Tracking)
     {
     emit this->valueIsChanging(newValue);
@@ -319,7 +320,7 @@ bool ctkSliderWidget::eventFilter(QObject *obj, QEvent *event)
        this->startChanging();
        }
      }
-   else if (event->type() == QEvent::MouseButtonRelease) 
+   else if (event->type() == QEvent::MouseButtonRelease)
      {
      QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
      if (mouseEvent->button() & Qt::LeftButton)
@@ -329,7 +330,7 @@ bool ctkSliderWidget::eventFilter(QObject *obj, QEvent *event)
        // send a valueChanged() after eventFilter() is done.
        this->stopChanging();
        }
-     } 
+     }
    // standard event processing
    return this->Superclass::eventFilter(obj, event);
  }
@@ -381,7 +382,7 @@ void ctkSliderWidget::setDecimals(int newDecimals)
   d->SpinBox->setDecimals(newDecimals);
   // The number of decimals can change the range values
   // i.e. 50.55 with 2 decimals -> 51 with 0 decimals
-  // As the SpinBox range change doesn't fire signals, 
+  // As the SpinBox range change doesn't fire signals,
   // we have to do the synchronization manually here
   d->Slider->setRange(d->SpinBox->minimum(), d->SpinBox->maximum());
   Q_ASSERT(d->equal(d->SpinBox->minimum(),d->Slider->minimum()));
@@ -438,7 +439,7 @@ double ctkSliderWidget::tickInterval()const
 
 // --------------------------------------------------------------------------
 void ctkSliderWidget::setTickInterval(double ti)
-{ 
+{
   Q_D(ctkSliderWidget);
   d->Slider->setTickInterval(ti);
 }

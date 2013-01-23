@@ -99,7 +99,7 @@ QWidget* ctkSmartSpinBoxDelegate::createEditor(QWidget* parent,
   editor->setMinimum(this->minimum());
   editor->setSingleStep(this->singleStep());
   connect(editor, SIGNAL(decimalsChanged(int)),
-          this, SLOT(emitDecimalsChangedSignal(int)));
+          this, SIGNAL(decimalsChanged(int)));
   connect(editor, SIGNAL(editingFinished()), this, SLOT(commitAndCloseEditor()));
   return editor;
 }
@@ -148,10 +148,4 @@ void ctkSmartSpinBoxDelegate::setModelData(QWidget *editor,
     {
     QStyledItemDelegate::setModelData(editor, model, index);
     }
-}
-
-//-----------------------------------------------------------------------------
-void ctkSmartSpinBoxDelegate::emitDecimalsChangedSignal(int decimals)
-{
-  emit this->decimalsChanged(decimals);
 }
