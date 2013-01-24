@@ -36,32 +36,6 @@
 #include <Qt>
 
 //-----------------------------------------------------------------------------
-// Custom item editors
-
-namespace
-{
-//-----------------------------------------------------------------------------
-  class ctkMatrixDoubleSpinBox : public QDoubleSpinBox
-  {
-  public:
-    ctkMatrixDoubleSpinBox(QWidget * parentWidget)
-      : QDoubleSpinBox(parentWidget)
-    {
-      // We know that the parentWidget() of parentWidget will be a
-      // ctkMatrixWidget because this object is
-      // created by the QItemEditorFactory
-      ctkMatrixWidget* matrixWidget =
-        qobject_cast<ctkMatrixWidget*>(parentWidget->parentWidget()->parent());
-      Q_ASSERT(matrixWidget);
-      this->setMinimum(matrixWidget->minimum());
-      this->setMaximum(matrixWidget->maximum());
-      this->setDecimals(matrixWidget->decimals());
-      this->setSingleStep(matrixWidget->singleStep());
-    }
-  };
-}
-
-//-----------------------------------------------------------------------------
 class ctkMatrixWidgetPrivate
 {
   Q_DECLARE_PUBLIC(ctkMatrixWidget);
@@ -137,15 +111,6 @@ void ctkMatrixWidgetPrivate::init()
 
   // Disable the frame by default
   this->Table->setFrameStyle(QFrame::NoFrame);
-
-  // Register custom editors
-//  QItemEditorFactory *editorFactory = new QItemEditorFactory;
-//  editorFactory->registerEditor(QVariant::Double, new QStandardItemEditorCreator<ctkMatrixDoubleSpinBox>);
-
-//  QStyledItemDelegate* defaultItemDelegate =
-//    qobject_cast<QStyledItemDelegate*>(this->Table->itemDelegate());
-//  Q_ASSERT(defaultItemDelegate);
-//  defaultItemDelegate->setItemEditorFactory(editorFactory);
 
   this->smartSpinBox = new ctkSmartSpinBoxDelegate();
   this->smartSpinBox->setDecimals(this->Decimals);
