@@ -89,6 +89,8 @@ protected:
   /// Overloaded method from QAbstractSpinBox.
   /// Sets the precision of the spinbox based on the number of significant
   /// decimals in the value entered by the user.
+  /// NOTE: On leaving focus, if the spinbox decimals are adjusted, it emits
+  /// the decimalsChanged() signal first and then the valueChanged() signal.
   void focusOutEvent(QFocusEvent* event);
 
   /// Converts the double value to the given decimal precision.

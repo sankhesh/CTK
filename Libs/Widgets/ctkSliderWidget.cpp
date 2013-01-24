@@ -46,7 +46,8 @@ public:
   void synchronizeSiblingSpinBox(int newWidth);
   bool equal(double spinBoxValue, double sliderValue)const
   {
-    return qAbs(sliderValue - spinBoxValue) < std::pow(10., -this->SpinBox->decimals());
+//    return qAbs(sliderValue - spinBoxValue) < std::pow(10., -this->SpinBox->decimals());
+    return qAbs(sliderValue - spinBoxValue) < std::pow(10., -6);
   }
 
   bool   Tracking;
