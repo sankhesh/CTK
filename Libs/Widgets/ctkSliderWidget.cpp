@@ -27,9 +27,6 @@
 #include "ctkSliderWidget.h"
 #include "ui_ctkSliderWidget.h"
 
-// STD includes
-#include <cmath>
-
 //-----------------------------------------------------------------------------
 class ctkSliderWidgetPrivate: public Ui_ctkSliderWidget
 {
@@ -46,8 +43,7 @@ public:
   void synchronizeSiblingSpinBox(int newWidth);
   bool equal(double spinBoxValue, double sliderValue)const
   {
-//    return qAbs(sliderValue - spinBoxValue) < std::pow(10., -this->SpinBox->decimals());
-    return qAbs(sliderValue - spinBoxValue) < std::pow(10., -6);
+    return qAbs(sliderValue - spinBoxValue) < 1e-6;
   }
 
   bool   Tracking;

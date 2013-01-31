@@ -69,6 +69,8 @@ public:
   /// \sa decimalsChanged()
   void setDecimals(int newDecimals);
 
+  bool eventFilter(QObject* object, QEvent* event);
+
 Q_SIGNALS:
   /// This signal is emitted whenever the value of the spinbox is going to
   /// change due to either user events or programmatically.
@@ -81,28 +83,41 @@ Q_SIGNALS:
   void decimalsChanged(int decimals);
 
 protected:
-  /// Overloaded method from QAbstractSpinBox.
+  /// Overloaded method from QAbstractSpinBox to handle focus in event.
   /// Changes the precision of the spinBox to a large value so that the user can
   /// enter value as desired.
   void focusInEvent(QFocusEvent* event);
 
-  /// Overloaded method from QAbstractSpinBox.
+  /// Overloaded method from QAbstractSpinBox to handle focus out event.
   /// Sets the precision of the spinbox based on the number of significant
   /// decimals in the value entered by the user.
   /// NOTE: On leaving focus, if the spinbox decimals are adjusted, it emits
   /// the decimalsChanged() signal first and then the valueChanged() signal.
   void focusOutEvent(QFocusEvent* event);
 
+  /// Overloaded method from QAbstractSpinBox to handle mouse press events.
+  /// Sets the precision of the spinbox based on the number of significant
+  /// decimals in the current value before calling the superclass method.
+  void mousePressEvent(QMouseEvent *event);
+
+  /// Overloaded method from QAbstractSpinBox to handle mouse release events.
+  /// Sets the precision of the spinbox to maximum possible for further editing.
+  void mouseReleaseEvent(QMouseEvent *event);
+
+  /// Overloaded method from QAbstractSpinBox to handle key press events.
+  /// Specifically handles the Up, Down, PageUp and PageDown keys.
+  /// Sets the precision of the spinbox based on the number of significant
+  /// decimals in the current value before calling the supeirclass method.
+  void keyPressEvent(QKeyEvent* event);
+
+  /// Overloaded method from QAbstractSpinBox to handle key release events.
+  /// Specifically handles the Up, Down, PageUp and PageDown keys.
+  /// Sets the precision of the spinbox to maximum possible for further editing.
+  void keyReleaseEvent(QKeyEvent* event);
+
   /// Converts the double value to the given decimal precision.
   /// Returns whether the operation was successful.
   static bool fixDoublePrecision(double& value, const int decimals);
-
-private Q_SLOTS:
-  /// adjustDecimals is called when the user is finished editing the spinBox
-  /// value. This method sets the precision of the spinBox based on the number
-  /// of significant decimals in the value entered by the user.
-  /// \sa ctk::significantDecimals()
-  void adjustDecimals();
 
 private:
   ctkSpinBoxPrivate* const d_ptr;

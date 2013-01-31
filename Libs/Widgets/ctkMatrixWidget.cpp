@@ -20,7 +20,7 @@
 
 // CTK includes
 #include "ctkMatrixWidget.h"
-#include "ctkSmartSpinBoxDelegate.h"
+#include "ctkSpinBoxDelegate.h"
 
 // Qt includes
 #include <QDebug>
@@ -58,7 +58,7 @@ public:
   int    Decimals;
   double SingleStep;
 
-  ctkSmartSpinBoxDelegate* smartSpinBox;
+  ctkSpinBoxDelegate* smartSpinBox;
 };
 
 //-----------------------------------------------------------------------------
@@ -112,7 +112,7 @@ void ctkMatrixWidgetPrivate::init()
   // Disable the frame by default
   this->Table->setFrameStyle(QFrame::NoFrame);
 
-  this->smartSpinBox = new ctkSmartSpinBoxDelegate();
+  this->smartSpinBox = new ctkSpinBoxDelegate();
   this->smartSpinBox->setDecimals(this->Decimals);
   this->smartSpinBox->setFixedPrecision(false);
   this->smartSpinBox->setMinimumDecimals(8);

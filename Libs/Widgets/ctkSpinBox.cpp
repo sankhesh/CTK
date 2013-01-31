@@ -28,6 +28,8 @@
 
 // Qt includes
 #include <QLineEdit>
+#include <QVariant>
+#include <QMouseEvent>
 
 //-----------------------------------------------------------------------------
 class ctkSpinBoxPrivate
@@ -39,26 +41,54 @@ public:
   ctkSpinBoxPrivate(ctkSpinBox& object)
     : q_ptr(&object)
     {
-    this->MinimumDecimals = 8;
+    this->MinimumDecimals = 2;
     this->FixedPrecision = false;
-    this->Decimals = 8;
+    this->Decimals = 2;
     }
 
   int MinimumDecimals;
   bool FixedPrecision;
   int Decimals;
+
+  void setMaximumDecimals(int currentDecimals,
+                          bool blockSignals = true);
 };
+
+//-----------------------------------------------------------------------------
+void ctkSpinBoxPrivate::setMaximumDecimals(int currentDecimals,
+                                           bool blockSignals)
+{
+  Q_Q(ctkSpinBox);
+  if (this->FixedPrecision)
+    {
+    return;
+    }
+  double oldValue = q->value();
+  bool blocked;
+  if (blockSignals)
+    {
+    blocked = q->blockSignals(true);
+    }
+  q->fixDoublePrecision(oldValue, currentDecimals);
+  q->Superclass::setDecimals(DBL_MAX_10_EXP + DBL_DIG);
+  QVariant variant(oldValue);
+  q->lineEdit()->setText(variant.toString());
+  if (blockSignals)
+    {
+    q->blockSignals(blocked);
+    }
+}
 
 //-----------------------------------------------------------------------------
 ctkSpinBox::ctkSpinBox(QWidget* parent)
   : QDoubleSpinBox(parent)
     ,d_ptr(new ctkSpinBoxPrivate(*this))
 {
+  this->lineEdit()->installEventFilter(this);
 }
 
 //-----------------------------------------------------------------------------
 CTK_GET_CPP(ctkSpinBox, int, minimumDecimals, MinimumDecimals);
-CTK_SET_CPP(ctkSpinBox, int, setMinimumDecimals, MinimumDecimals);
 CTK_GET_CPP(ctkSpinBox, bool, fixedPrecision, FixedPrecision);
 CTK_SET_CPP(ctkSpinBox, bool, setFixedPrecision, FixedPrecision);
 
@@ -67,18 +97,7 @@ void ctkSpinBox::focusInEvent(QFocusEvent* event)
 {
   Q_D(ctkSpinBox);
   emit this->valueAboutToBeChanged();
-  if (!d->FixedPrecision)
-    {
-    double oldValue = this->value();
-    this->blockSignals(true);
-    int decimals = this->decimals();
-    this->fixDoublePrecision(oldValue, decimals);
-    // Set maximum possible precision
-    this->setDecimals(DBL_MAX_10_EXP + DBL_DIG);
-    QVariant variant(oldValue);
-    this->lineEdit()->setText(variant.toString());
-    this->blockSignals(false);
-    }
+  d->setMaximumDecimals(this->decimals());
   Superclass::focusInEvent(event);
 }
 
@@ -88,32 +107,95 @@ void ctkSpinBox::focusOutEvent(QFocusEvent* event)
   Q_D(ctkSpinBox);
   if (!d->FixedPrecision)
     {
-    this->adjustDecimals();
+    int decimals = qMax(ctk::significantDecimals(this->value()),
+                        d->MinimumDecimals);
+    this->setDecimals(decimals);
     }
   Superclass::focusOutEvent(event);
 }
 
 //-----------------------------------------------------------------------------
-void ctkSpinBox::adjustDecimals()
+bool ctkSpinBox::eventFilter( QObject* object, QEvent* event)
+{
+  Q_UNUSED(object);
+  Q_D(ctkSpinBox);
+  if ( event->type() == QEvent::MouseButtonPress ||
+       event->type() == QEvent::KeyPress)
+    {
+    int decimals = qMax(ctk::significantDecimals(this->value()),
+                        d->MinimumDecimals);
+    d->setMaximumDecimals(decimals);
+    return false;
+    }
+  else
+    {
+    return false;
+    }
+}
+
+//-----------------------------------------------------------------------------
+void ctkSpinBox::keyPressEvent(QKeyEvent* event)
+{
+  Q_D(ctkSpinBox);
+  if (event->key() == Qt::Key_Up || event->key() == Qt::Key_Down ||
+      event->key() == Qt::Key_PageUp || event->key() == Qt::Key_PageDown ||
+      event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
+    {
+    int decimals = qMax(ctk::significantDecimals(this->value()),
+                        d->MinimumDecimals);
+    this->setDecimals(decimals);
+    }
+  Superclass::keyPressEvent(event);
+}
+
+//-----------------------------------------------------------------------------
+void ctkSpinBox::keyReleaseEvent(QKeyEvent* event)
+{
+  Q_D(ctkSpinBox);
+  if (event->key() == Qt::Key_Up || event->key() == Qt::Key_Down ||
+      event->key() == Qt::Key_PageUp || event->key() == Qt::Key_PageDown)
+    {
+    int decimals = qMax(ctk::significantDecimals(this->value()),
+                        d->MinimumDecimals);
+    d->setMaximumDecimals(decimals);
+    }
+  Superclass::keyReleaseEvent(event);
+}
+
+//-----------------------------------------------------------------------------
+void ctkSpinBox::mousePressEvent(QMouseEvent* event)
+{
+  Q_D(ctkSpinBox);
+  emit valueAboutToBeChanged();
+  int decimals = qMax(ctk::significantDecimals(this->value()),
+                      d->MinimumDecimals);
+  this->setDecimals(decimals);
+  Superclass::mousePressEvent(event);
+}
+
+//-----------------------------------------------------------------------------
+void ctkSpinBox::mouseReleaseEvent(QMouseEvent* event)
 {
   Q_D(ctkSpinBox);
   int decimals = qMax(ctk::significantDecimals(this->value()),
                       d->MinimumDecimals);
-  this->blockSignals(true);
-  this->setDecimals(decimals);
-  this->blockSignals(false);
-  if (decimals != d->Decimals)
-    {
-    d->Decimals = decimals;
-    emit this->decimalsChanged(d->Decimals);
-    }
+  d->setMaximumDecimals(decimals);
+  Superclass::mouseReleaseEvent(event);
 }
 
 //-----------------------------------------------------------------------------
 bool ctkSpinBox::fixDoublePrecision(double& value, const int decimals)
 {
   double newValue = value*(pow(10, decimals));
-  double longValue = static_cast<long>(newValue);
+  QVariant var(newValue);
+  bool castOK = false;
+  qlonglong longValue = var.toLongLong(&castOK);
+
+  // Check if the value could be converted to an integer
+  if (!castOK)
+    {
+    return false;
+    }
 
   // Check if the casting hasn't exceeded the numeric limits of long type
   double error = abs (longValue - newValue);
@@ -135,12 +217,7 @@ void ctkSpinBox::setValue(double newValue)
     // Change precision to accomodate the new value
     int decimals = qMax(ctk::significantDecimals(newValue),
                         d->MinimumDecimals);
-    if(d->Decimals != decimals)
-      {
-      d->Decimals = decimals;
-      this->setDecimals(d->Decimals);
-      emit this->decimalsChanged(d->Decimals);
-      }
+    this->setDecimals(decimals);
     }
   Superclass::setValue(newValue);
 }
@@ -149,10 +226,30 @@ void ctkSpinBox::setValue(double newValue)
 void ctkSpinBox::setDecimals(int newDecimals)
 {
   Q_D(ctkSpinBox);
-  Superclass::setDecimals(newDecimals);
+  if (!(d->FixedPrecision) && (newDecimals < d->MinimumDecimals))
+    {
+    // Make sure that minimum precision is preserved.
+    newDecimals = d->MinimumDecimals;
+    }
   if (d->Decimals != newDecimals)
     {
     d->Decimals = newDecimals;
     emit this->decimalsChanged(newDecimals);
+    }
+  Superclass::setDecimals(newDecimals);
+}
+
+//-----------------------------------------------------------------------------
+void ctkSpinBox::setMinimumDecimals(int newMinimumDecimals)
+{
+  Q_D(ctkSpinBox);
+  if (d->FixedPrecision)
+    {
+    return;
+    }
+  d->MinimumDecimals = newMinimumDecimals;
+  if (d->Decimals < newMinimumDecimals)
+    {
+    this->setDecimals(newMinimumDecimals);
     }
 }

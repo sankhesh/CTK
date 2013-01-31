@@ -18,21 +18,21 @@
 
 =========================================================================*/
 
-#ifndef __ctkSmartSpinBoxDelegate_h
-#define __ctkSmartSpinBoxDelegate_h
+#ifndef __ctkSpinBoxDelegate_h
+#define __ctkSpinBoxDelegate_h
 
 // Qt includes
 #include <QStyledItemDelegate>
 
 #include "ctkWidgetsExport.h"
 
-class ctkSmartSpinBoxDelegatePrivate;
+class ctkSpinBoxDelegatePrivate;
 
 /// \brief Item delegate for smart spinBox editing.
 /// Uses ctkSpinBox to automatically adjust the precision of the
 /// spinBox according the new value entered by the user. Used in ctkMatrixWidget
 /// \sa ctkSpinBox, ctkMatrixWidget
-class CTK_WIDGETS_EXPORT ctkSmartSpinBoxDelegate : public QStyledItemDelegate
+class CTK_WIDGETS_EXPORT ctkSpinBoxDelegate : public QStyledItemDelegate
 {
   Q_OBJECT
   Q_PROPERTY(int decimals READ decimals WRITE setDecimals)
@@ -46,7 +46,7 @@ public:
   typedef QStyledItemDelegate Superclass;
 
   /// Constructor
-  ctkSmartSpinBoxDelegate(QWidget* parent = 0);
+  ctkSpinBoxDelegate(QWidget* parent = 0);
 
   /// Creates and returns the editor to be used for editing the data item with
   /// the given index.
@@ -112,8 +112,8 @@ private Q_SLOTS:
   void commitAndCloseEditor();
 
 private:
-  ctkSmartSpinBoxDelegatePrivate* const d_ptr;
-  Q_DECLARE_PRIVATE(ctkSmartSpinBoxDelegate);
-  Q_DISABLE_COPY(ctkSmartSpinBoxDelegate);
+  ctkSpinBoxDelegatePrivate* const d_ptr;
+  Q_DECLARE_PRIVATE(ctkSpinBoxDelegate);
+  Q_DISABLE_COPY(ctkSpinBoxDelegate);
 };
-#endif //__ctkSmartSpinBoxDelegate_h
+#endif //__ctkSpinBoxDelegate_h

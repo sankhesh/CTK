@@ -20,18 +20,18 @@
 
 // CTK includes
 #include "ctkPimpl.h"
-#include "ctkSmartSpinBoxDelegate.h"
+#include "ctkSpinBoxDelegate.h"
 #include "ctkSpinBox.h"
 #include "ctkUtils.h"
 
 //-----------------------------------------------------------------------------
-class ctkSmartSpinBoxDelegatePrivate
+class ctkSpinBoxDelegatePrivate
 {
-  Q_DECLARE_PUBLIC(ctkSmartSpinBoxDelegate);
+  Q_DECLARE_PUBLIC(ctkSpinBoxDelegate);
 protected:
-  ctkSmartSpinBoxDelegate* const q_ptr;
+  ctkSpinBoxDelegate* const q_ptr;
 public:
-  ctkSmartSpinBoxDelegatePrivate(ctkSmartSpinBoxDelegate& object);
+  ctkSpinBoxDelegatePrivate(ctkSpinBoxDelegate& object);
 
   void init();
   // Parameters for the spinbox
@@ -44,48 +44,48 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-ctkSmartSpinBoxDelegatePrivate::ctkSmartSpinBoxDelegatePrivate(
-                                  ctkSmartSpinBoxDelegate& object)
+ctkSpinBoxDelegatePrivate::ctkSpinBoxDelegatePrivate(
+                                  ctkSpinBoxDelegate& object)
   :q_ptr(&object)
 {
 }
 
 //-----------------------------------------------------------------------------
-void ctkSmartSpinBoxDelegatePrivate::init()
+void ctkSpinBoxDelegatePrivate::init()
 {
-  this->Decimals = 8;
+  this->Decimals = 2;
   this->FixedPrecision = false;
-  this->MinimumDecimals = 8;
+  this->MinimumDecimals = 2;
   this->Maximum = 100;
   this->Minimum = 0;
   this->SingleStep = 1;
 }
 
 //-----------------------------------------------------------------------------
-CTK_SET_CPP(ctkSmartSpinBoxDelegate, int, setDecimals, Decimals);
-CTK_GET_CPP(ctkSmartSpinBoxDelegate, int, decimals, Decimals);
-CTK_SET_CPP(ctkSmartSpinBoxDelegate, bool, setFixedPrecision, FixedPrecision);
-CTK_GET_CPP(ctkSmartSpinBoxDelegate, bool, fixedPrecision, FixedPrecision);
-CTK_SET_CPP(ctkSmartSpinBoxDelegate, int, setMinimumDecimals, MinimumDecimals);
-CTK_GET_CPP(ctkSmartSpinBoxDelegate, int, minimumDecimals, MinimumDecimals);
-CTK_SET_CPP(ctkSmartSpinBoxDelegate, double, setMaximum, Maximum);
-CTK_GET_CPP(ctkSmartSpinBoxDelegate, double, maximum, Maximum);
-CTK_SET_CPP(ctkSmartSpinBoxDelegate, double, setMinimum, Minimum);
-CTK_GET_CPP(ctkSmartSpinBoxDelegate, double, minimum, Minimum);
-CTK_SET_CPP(ctkSmartSpinBoxDelegate, double, setSingleStep, SingleStep);
-CTK_GET_CPP(ctkSmartSpinBoxDelegate, double, singleStep, SingleStep);
+CTK_SET_CPP(ctkSpinBoxDelegate, int, setDecimals, Decimals);
+CTK_GET_CPP(ctkSpinBoxDelegate, int, decimals, Decimals);
+CTK_SET_CPP(ctkSpinBoxDelegate, bool, setFixedPrecision, FixedPrecision);
+CTK_GET_CPP(ctkSpinBoxDelegate, bool, fixedPrecision, FixedPrecision);
+CTK_SET_CPP(ctkSpinBoxDelegate, int, setMinimumDecimals, MinimumDecimals);
+CTK_GET_CPP(ctkSpinBoxDelegate, int, minimumDecimals, MinimumDecimals);
+CTK_SET_CPP(ctkSpinBoxDelegate, double, setMaximum, Maximum);
+CTK_GET_CPP(ctkSpinBoxDelegate, double, maximum, Maximum);
+CTK_SET_CPP(ctkSpinBoxDelegate, double, setMinimum, Minimum);
+CTK_GET_CPP(ctkSpinBoxDelegate, double, minimum, Minimum);
+CTK_SET_CPP(ctkSpinBoxDelegate, double, setSingleStep, SingleStep);
+CTK_GET_CPP(ctkSpinBoxDelegate, double, singleStep, SingleStep);
 
 //-----------------------------------------------------------------------------
-ctkSmartSpinBoxDelegate::ctkSmartSpinBoxDelegate(QWidget* parent)
+ctkSpinBoxDelegate::ctkSpinBoxDelegate(QWidget* parent)
   : Superclass(parent)
-    ,d_ptr(new ctkSmartSpinBoxDelegatePrivate(*this))
+    ,d_ptr(new ctkSpinBoxDelegatePrivate(*this))
 {
-  Q_D(ctkSmartSpinBoxDelegate);
+  Q_D(ctkSpinBoxDelegate);
   d->init();
 }
 
 //-----------------------------------------------------------------------------
-QWidget* ctkSmartSpinBoxDelegate::createEditor(QWidget* parent,
+QWidget* ctkSpinBoxDelegate::createEditor(QWidget* parent,
                                                const QStyleOptionViewItem &option,
                                                const QModelIndex &index)const
 {
@@ -105,7 +105,7 @@ QWidget* ctkSmartSpinBoxDelegate::createEditor(QWidget* parent,
 }
 
 //-----------------------------------------------------------------------------
-void ctkSmartSpinBoxDelegate::commitAndCloseEditor()
+void ctkSpinBoxDelegate::commitAndCloseEditor()
 {
   ctkSpinBox* editor = qobject_cast<ctkSpinBox *>(sender());
   // Get the new precision from the editor
@@ -115,7 +115,7 @@ void ctkSmartSpinBoxDelegate::commitAndCloseEditor()
 }
 
 //-----------------------------------------------------------------------------
-void ctkSmartSpinBoxDelegate::setEditorData(QWidget* editor,
+void ctkSpinBoxDelegate::setEditorData(QWidget* editor,
                                             const QModelIndex &index)const
 {
   if (qVariantCanConvert<double>(index.data()))
@@ -134,7 +134,7 @@ void ctkSmartSpinBoxDelegate::setEditorData(QWidget* editor,
 }
 
 //-----------------------------------------------------------------------------
-void ctkSmartSpinBoxDelegate::setModelData(QWidget *editor,
+void ctkSpinBoxDelegate::setModelData(QWidget *editor,
                                            QAbstractItemModel *model,
                                            const QModelIndex &index) const
 {
