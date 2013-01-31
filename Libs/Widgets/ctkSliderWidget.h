@@ -120,6 +120,23 @@ public:
   void setDecimals(int decimals);
 
   ///
+  /// This property holds the minimum precision of the spin box, in decimals.
+  /// When the user enters a value, its precision will be compared to
+  /// MinimumDecimals and the higher value will be set as the precision
+  /// of the model. This is ignored if FixedPrecision is set to true.
+  /// \sa ctkSmartSpinBoxDelegate::setMinimumDecimals(), setFixedPrecision()
+  int minimumDecimals()const;
+  void setMinimumDecimals(int newMinimumDecimals);
+
+  ///
+  /// This property holds whether the spin box has a fixed precision
+  /// If set to true, the number of decimals can be set by setDecimals().
+  /// If set to false, one can set the number of minimum decimals.
+  /// \sa QDoubleSpinBox::setDecimals(), setMinimumDecimals()
+  bool fixedPrecision()const;
+  void setFixedPrecision(bool enable);
+
+  ///
   /// This property holds the spin box's prefix.
   /// The prefix is prepended to the start of the displayed value.
   /// Typical use is to display a unit of measurement or a currency symbol

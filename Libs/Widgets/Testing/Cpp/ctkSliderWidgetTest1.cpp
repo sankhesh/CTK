@@ -86,6 +86,7 @@ int ctkSliderWidgetTest1(int argc, char * argv [] )
     return EXIT_FAILURE;
     }
 
+  sliderSpinBox.setMinimumDecimals(1);
   sliderSpinBox.setDecimals(1);
 
   if (sliderSpinBox.decimals() != 1 || 

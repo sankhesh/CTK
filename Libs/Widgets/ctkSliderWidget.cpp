@@ -388,6 +388,42 @@ void ctkSliderWidget::setDecimals(int newDecimals)
 }
 
 // --------------------------------------------------------------------------
+int ctkSliderWidget::minimumDecimals()const
+{
+  Q_D(const ctkSliderWidget);
+  return d->SpinBox->minimumDecimals();
+}
+
+// --------------------------------------------------------------------------
+void ctkSliderWidget::setMinimumDecimals(int newMinimumDecimals)
+{
+  Q_D(ctkSliderWidget);
+  d->SpinBox->setMinimumDecimals(newMinimumDecimals);
+  d->Slider->setRange(d->SpinBox->minimum(), d->SpinBox->maximum());
+  Q_ASSERT(d->equal(d->SpinBox->minimum(),d->Slider->minimum()));
+  Q_ASSERT(d->equal(d->SpinBox->value(),d->Slider->value()));
+  Q_ASSERT(d->equal(d->SpinBox->maximum(),d->Slider->maximum()));
+}
+
+// --------------------------------------------------------------------------
+bool ctkSliderWidget::fixedPrecision()const
+{
+  Q_D(const ctkSliderWidget);
+  return d->SpinBox->fixedPrecision();
+}
+
+// --------------------------------------------------------------------------
+void ctkSliderWidget::setFixedPrecision(bool newFixedPrecision)
+{
+  Q_D(ctkSliderWidget);
+  d->SpinBox->setFixedPrecision(newFixedPrecision);
+  d->Slider->setRange(d->SpinBox->minimum(), d->SpinBox->maximum());
+  Q_ASSERT(d->equal(d->SpinBox->minimum(),d->Slider->minimum()));
+  Q_ASSERT(d->equal(d->SpinBox->value(),d->Slider->value()));
+  Q_ASSERT(d->equal(d->SpinBox->maximum(),d->Slider->maximum()));
+}
+
+// --------------------------------------------------------------------------
 QString ctkSliderWidget::prefix()const
 {
   Q_D(const ctkSliderWidget);
