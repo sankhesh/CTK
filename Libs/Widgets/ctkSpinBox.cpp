@@ -130,7 +130,8 @@ bool ctkSpinBox::eventFilter( QObject* object, QEvent* event)
   Q_UNUSED(object);
   Q_D(ctkSpinBox);
   if ( event->type() == QEvent::MouseButtonPress ||
-       event->type() == QEvent::KeyPress)
+       event->type() == QEvent::KeyPress ||
+       event->type() == QEvent::Wheel)
     {
     d->consolidateValue();
     d->setMaximumDecimals();
@@ -184,6 +185,17 @@ void ctkSpinBox::mouseReleaseEvent(QMouseEvent* event)
   d->consolidateValue();
   d->setMaximumDecimals();
   Superclass::mouseReleaseEvent(event);
+}
+
+//-----------------------------------------------------------------------------
+void ctkSpinBox::wheelEvent(QWheelEvent* event)
+{
+  Q_D(ctkSpinBox);
+  emit valueAboutToBeChanged();
+  d->consolidateValue();
+  Superclass::wheelEvent(event);
+  d->consolidateValue();
+  d->setMaximumDecimals();
 }
 
 //-----------------------------------------------------------------------------

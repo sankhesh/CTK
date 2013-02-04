@@ -104,6 +104,11 @@ protected:
   /// Sets the precision of the spinbox to maximum possible for further editing.
   void mouseReleaseEvent(QMouseEvent *event);
 
+  /// Overloaded method from QAbstractSpinBox to handle mouse wheel events.
+  /// Sets the precision of the spinbox based on the number of significant
+  /// decimals in the current value before calling the superclass method.
+  void wheelEvent(QWheelEvent *event);
+
   /// Overloaded method from QAbstractSpinBox to handle key press events.
   /// Specifically handles the Up, Down, PageUp and PageDown keys.
   /// Sets the precision of the spinbox based on the number of significant
