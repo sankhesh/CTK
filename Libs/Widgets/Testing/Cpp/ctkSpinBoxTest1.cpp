@@ -30,7 +30,7 @@
 #include <iostream>
 
 //-----------------------------------------------------------------------------
-int ctkSpinBoxTest(int argc, char * argv [] )
+int ctkSpinBoxTest1(int argc, char * argv [] )
 {
   QApplication app(argc, argv);
 
@@ -77,7 +77,7 @@ int ctkSpinBoxTest(int argc, char * argv [] )
   if (spinBox.decimals() != 2)
     {
     std::cerr << "ctkSpinBox::setDecimals failed with Decimals = "
-              << spinBox.decimals() << " & MinimumDecimals = " 
+              << spinBox.decimals() << " & MinimumDecimals = "
               << spinBox.minimumDecimals() << std::endl;
     return EXIT_FAILURE;
     }
@@ -99,7 +99,7 @@ int ctkSpinBoxTest(int argc, char * argv [] )
               << spinBox.decimals() << std::endl;
     return EXIT_FAILURE;
     }
-  
+
 //-----------------------------------------------------------------------------
   spinBox.show();
   if (argc < 2 || QString(argv[1]) != "-I" )
