@@ -129,7 +129,7 @@ ctkSliderWidget::ctkSliderWidget(QWidget* _parent) : Superclass(_parent)
   d->Slider->setMaximum(d->SpinBox->maximum());
   d->Slider->setMinimum(d->SpinBox->minimum());
 
-  this->connect(d->SpinBox, SIGNAL(valueChanged(double)), d->Slider, SLOT(setValue(double)));
+  this->connect(d->SpinBox, SIGNAL(valueChanged(double)), this, SLOT(setSliderValue(double)));
   this->connect(d->SpinBox, SIGNAL(decimalsChanged(int)), this, SIGNAL(decimalsChanged(int)));
 
   //this->connect(d->Slider, SIGNAL(valueChanged(double)), SIGNAL(valueChanged(double)));
@@ -259,6 +259,21 @@ void ctkSliderWidget::setValue(double _value)
   d->Changing = isChanging;
 }
 
+// --------------------------------------------------------------------------
+void ctkSliderWidget::setSliderValue(double _value)
+{
+  Q_D(ctkSliderWidget);
+  // Block signals from Slider
+  bool wasBlocked = d->Slider->blockSignals(true);
+  bool isChanging = d->Changing;
+  d->Changing = false;
+  d->Slider->setValue(_value);
+  Q_ASSERT(d->equal(d->SpinBox->minimum(),d->Slider->minimum()));
+  Q_ASSERT(d->equal(d->SpinBox->value(),d->Slider->value()));
+  Q_ASSERT(d->equal(d->SpinBox->maximum(),d->Slider->maximum()));
+  d->Slider->blockSignals(wasBlocked);
+  d->Changing = isChanging;
+}
 // --------------------------------------------------------------------------
 void ctkSliderWidget::startChanging()
 {
@@ -416,6 +431,10 @@ bool ctkSliderWidget::fixedPrecision()const
 void ctkSliderWidget::setFixedPrecision(bool newFixedPrecision)
 {
   Q_D(ctkSliderWidget);
+  if (!newFixedPrecision)
+    {
+    d->SpinBox->setKeyboardTracking(false);
+    }
   d->SpinBox->setFixedPrecision(newFixedPrecision);
   d->Slider->setRange(d->SpinBox->minimum(), d->SpinBox->maximum());
   Q_ASSERT(d->equal(d->SpinBox->minimum(),d->Slider->minimum()));

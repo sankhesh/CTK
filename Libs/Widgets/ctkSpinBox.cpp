@@ -45,12 +45,14 @@ public:
     this->FixedPrecision = true;
     this->Decimals = 2;
     this->Value = QVariant::Double;
+    this->MaximumSize = object.maximumSize();
     }
 
   int MinimumDecimals;
   bool FixedPrecision;
   int Decimals;
   QVariant Value;
+  QSize MaximumSize;
 
   void setMaximumDecimals(bool blockSignals = true);
   void consolidateValue();
@@ -66,6 +68,10 @@ void ctkSpinBoxPrivate::setMaximumDecimals(bool blockSignals)
     }
   double oldValue = q->value();
   bool blocked;
+  // Set the current size as maximum size for the spinbox
+  // This is a hack preventing the spinbox to resize while editing
+  this->MaximumSize = q->maximumSize();
+  q->setMaximumSize(q->size());
   if (blockSignals)
     {
     blocked = q->blockSignals(true);
@@ -87,6 +93,11 @@ void ctkSpinBoxPrivate::consolidateValue()
   QVariant var(q->lineEdit()->text());
   double val = var.toDouble();
   q->setValue(val);
+  if (!this->FixedPrecision)
+    {
+    // Reset the maximum size
+    q->setMaximumSize(this->MaximumSize);
+    }
 }
 
 //-----------------------------------------------------------------------------
@@ -151,6 +162,7 @@ void ctkSpinBox::keyPressEvent(QKeyEvent* event)
       event->key() == Qt::Key_PageUp || event->key() == Qt::Key_PageDown ||
       event->key() == Qt::Key_Return || event->key() == Qt::Key_Enter)
     {
+    emit valueAboutToBeChanged();
     d->consolidateValue();
     }
   Superclass::keyPressEvent(event);
