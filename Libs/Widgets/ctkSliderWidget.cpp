@@ -265,14 +265,12 @@ void ctkSliderWidget::setSliderValue(double _value)
   Q_D(ctkSliderWidget);
   // Block signals from Slider
   bool wasBlocked = d->Slider->blockSignals(true);
-  bool isChanging = d->Changing;
-  d->Changing = false;
   d->Slider->setValue(_value);
   Q_ASSERT(d->equal(d->SpinBox->minimum(),d->Slider->minimum()));
   Q_ASSERT(d->equal(d->SpinBox->value(),d->Slider->value()));
   Q_ASSERT(d->equal(d->SpinBox->maximum(),d->Slider->maximum()));
   d->Slider->blockSignals(wasBlocked);
-  d->Changing = isChanging;
+  emit this->valueChanged(_value);
 }
 // --------------------------------------------------------------------------
 void ctkSliderWidget::startChanging()
