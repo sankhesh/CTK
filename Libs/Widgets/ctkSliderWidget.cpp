@@ -19,7 +19,6 @@
 =========================================================================*/
 
 // Qt includes
-#include <QDebug>
 #include <QMouseEvent>
 
 // CTK includes
@@ -389,7 +388,9 @@ int ctkSliderWidget::decimals()const
 void ctkSliderWidget::setDecimals(int newDecimals)
 {
   Q_D(ctkSliderWidget);
+  bool wasBlocked = d->SpinBox->blockSignals(true);
   d->SpinBox->setDecimals(newDecimals);
+  d->SpinBox->blockSignals(wasBlocked);
   // The number of decimals can change the range values
   // i.e. 50.55 with 2 decimals -> 51 with 0 decimals
   // As the SpinBox range change doesn't fire signals,
@@ -398,6 +399,7 @@ void ctkSliderWidget::setDecimals(int newDecimals)
   Q_ASSERT(d->equal(d->SpinBox->minimum(),d->Slider->minimum()));
   Q_ASSERT(d->equal(d->SpinBox->value(),d->Slider->value()));
   Q_ASSERT(d->equal(d->SpinBox->maximum(),d->Slider->maximum()));
+  emit this->decimalsChanged(newDecimals);
 }
 
 // --------------------------------------------------------------------------
