@@ -115,7 +115,7 @@ void ctkMatrixWidgetPrivate::init()
   this->smartSpinBox = new ctkSpinBoxDelegate();
   this->smartSpinBox->setDecimals(this->Decimals);
   this->smartSpinBox->setFixedPrecision(false);
-  this->smartSpinBox->setMinimumDecimals(8);
+  this->smartSpinBox->setMinimumDecimals(this->Decimals);
   this->smartSpinBox->setMaximum(this->Maximum);
   this->smartSpinBox->setMinimum(this->Minimum);
   this->smartSpinBox->setSingleStep(this->SingleStep);
